@@ -60,20 +60,6 @@
 
   ::selection{ background: var(--seam-gold); color:var(--osaki-ink); }
 
-  /* ---------- aviso de desarrollo (solo visible si falta el mensaje) ---------- */
-  .devwarning{
-    display:none;
-    position:sticky; top:0; z-index:50;
-    padding: calc(env(safe-area-inset-top, 0px) + 0.55rem) 1rem 0.55rem;
-    background: #3a2f1a;
-    color: #f2cf8a;
-    font-family: var(--serif);
-    font-size:0.72rem;
-    letter-spacing:0.04em;
-    text-align:center;
-    border-bottom:1px solid rgba(242,207,138,0.35);
-  }
-
   /* ---------- HERO ---------- */
   .hero{
     position:relative;
@@ -84,6 +70,7 @@
   }
   .half{
     position:relative;
+    isolation:isolate;
     flex:1 1 50%;
     min-height:100vh;
     min-height:100svh;
@@ -160,10 +147,97 @@
   .hachi p.tagline{ margin-left:auto; text-align:right; color: var(--hachi-plum-dim); }
   .osaki p.tagline{ color: var(--osaki-bone-dim); }
   @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes spinVinyl{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+  /* ---------- VINILO ---------- */
+  .vinyl-wrap{
+    margin: 3.6rem auto 0; max-width:320px;
+    display:flex; flex-direction:column; align-items:center; gap:1.6rem;
+    opacity:0; animation: fadeUp 1s ease 0.45s forwards;
+  }
+  .vinyl{
+    position:relative; width:210px; height:210px; border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at center, #0c0c0f 0 2px, #1e1e22 2px 4px);
+    box-shadow: 0 22px 44px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(227,181,103,0.3);
+    animation: spinVinyl 5s linear infinite;
+    animation-play-state: paused;
+  }
+  .vinyl.playing{ animation-play-state: running; }
+  .vinyl-label{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:74px; height:74px; border-radius:50%;
+    background: var(--hachi-cream);
+    border: 2px solid var(--seam-gold);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:var(--serif); font-size:0.5rem; letter-spacing:0.03em; color:var(--hachi-plum);
+    padding:0.3rem;
+    overflow:hidden;
+  }
+  .vinyl-label::after{
+    content:''; position:absolute; width:8px; height:8px; border-radius:50%;
+    background: var(--osaki-ink);
+  }
+  .tonearm{
+    position:absolute; top:-10px; right:-34px; width:118px; height:5px;
+    transform-origin: 92% 30%;
+    transform: rotate(20deg);
+    transition: transform 0.7s ease;
+    pointer-events:none;
+  }
+  .tonearm::before{
+    content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:100%; height:3px; background: var(--seam-gold); border-radius:2px;
+  }
+  .tonearm::after{
+    content:''; position:absolute; right:-4px; top:50%; transform:translateY(-50%);
+    width:12px; height:12px; border-radius:50%; background: var(--osaki-blood);
+    box-shadow: 0 0 0 3px rgba(200,29,63,0.25);
+  }
+  .tonearm.active{ transform: rotate(-30deg); }
+
+  .tracklist{ width:100%; display:flex; flex-direction:column; gap:0.6rem; }
+  .track-btn{
+    display:flex; flex-direction:column; align-items:flex-start; gap:0.15rem;
+    width:100%; text-align:left; cursor:pointer;
+    background: rgba(22,18,26,0.55);
+    border: 1px solid rgba(227,181,103,0.25);
+    border-radius: 4px;
+    padding: 0.6rem 0.9rem;
+    font-family: var(--serif); color: var(--osaki-bone);
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+  .track-btn:hover{ border-color: var(--seam-gold); }
+  .track-btn.active{ background: rgba(22,18,26,0.7); border-color: var(--seam-gold); }
+  .track-btn .track-title{ font-size:0.9rem; }
+  .track-btn .track-artist{ font-size:0.68rem; color: var(--osaki-bone-dim); }
+  .track-btn.missing .track-artist{ color: var(--osaki-ember); }
 
   .pin{ position:absolute; width:30px; height:30px; opacity:0.8; }
   .pin.tl{ top:8%; left:6%; }
   .pin.br{ bottom:10%; right:8%; transform:rotate(18deg); }
+
+  /* ---------- ARTE NANA ---------- */
+  .char-art{
+    position:absolute; bottom:0; z-index:-1;
+    pointer-events:none; object-fit:contain;
+  }
+  .char-osaki{ right:3%; height:260px; width:auto; opacity:0.85; }
+  .char-hachi{ left:3%; height:230px; width:auto; opacity:0.8; }
+  .duo-art{
+    display:block; margin:0 auto 1.6rem; height:150px; width:auto;
+    opacity:0; animation: fadeUp 1s ease 0.05s forwards;
+    filter: drop-shadow(0 14px 22px rgba(0,0,0,0.4));
+  }
+  .logo-art{
+    display:block; margin:2rem auto 0; width:min(38vw,150px); height:auto;
+    filter: grayscale(1) brightness(0.4);
+    opacity:0.85;
+  }
+  @media (max-width:760px){
+    .char-art{ opacity:0.55; height:170px; }
+    .duo-art{ height:110px; }
+  }
 
   .thread-svg{
     position:absolute; inset:0; width:100%; height:100%;
@@ -210,28 +284,47 @@
     text-wrap:balance;
     opacity:0; animation: fadeUp 1s ease 0.15s forwards;
   }
-  .note{
-    max-width:46ch; margin:0 auto;
+  /* ---------- CARTA ---------- */
+  .letter{
     background: var(--hachi-cream);
-    color: var(--hachi-plum);
-    padding: 3rem 2.2rem;
-    font-family: var(--display-soft); font-style:italic; font-size:1.25rem; line-height:1.6;
-    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.55), 0 0 0 1px rgba(227,181,103,0.4);
-    position:relative;
-    transform: rotate(-0.6deg);
-    opacity:0; animation: fadeUp 1s ease 0.3s forwards;
-    white-space:pre-wrap;
+    padding: 11vh 6vw 13vh;
+    display:flex; flex-direction:column; align-items:center;
   }
-  .note::before{
+  .letter-eyebrow{
+    font-family:var(--serif); font-style:italic; font-size:0.85rem;
+    letter-spacing:0.08em; color:var(--hachi-plum-dim); margin:0 0 2rem;
+  }
+  .letter-card{
+    max-width:640px; width:100%;
+    background:#fffaf5;
+    color: var(--hachi-plum);
+    padding: 3rem 2.4rem;
+    font-family: var(--serif); font-size:1.02rem; line-height:1.85;
+    box-shadow: 0 30px 60px -24px rgba(0,0,0,0.35), 0 0 0 1px rgba(227,181,103,0.35);
+    position:relative;
+  }
+  .letter-card::before{
     content:'';
-    position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-3deg);
-    width:64px; height:22px;
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-2deg);
+    width:70px; height:22px;
     background: rgba(227,181,103,0.5);
     box-shadow: 0 4px 8px rgba(0,0,0,0.25);
   }
-  .note .tag{
-    display:block; font-family:var(--serif); font-style:normal; font-size:0.66rem;
-    letter-spacing:0.2em; text-transform:uppercase; color:var(--hachi-plum-dim); margin-top:1.4rem;
+  .letter-card p{ margin:0 0 1.3rem; }
+  .letter-card p:last-child{ margin-bottom:0; }
+  .letter-card blockquote{
+    margin: 1.8rem 0; padding-left:1.1rem;
+    border-left: 3px solid var(--seam-gold);
+    font-family: var(--display-soft); font-style:italic; font-size:1.15rem;
+    color: var(--hachi-plum-dim);
+  }
+  .letter-card blockquote p{ margin:0; }
+  .letter-card .cite{
+    display:block; text-align:right; font-family:var(--serif); font-style:normal;
+    font-size:0.75rem; letter-spacing:0.06em; color:var(--hachi-plum-dim); margin-top:0.4rem;
+  }
+  @media (max-width:760px){
+    .letter-card{ padding:2.4rem 1.5rem; font-size:0.96rem; }
   }
 
   /* ---------- PHOTO DUET ---------- */
@@ -244,7 +337,7 @@
     align-items:center;
   }
   .frame{
-    aspect-ratio:4/5;
+    aspect-ratio:4/3;
     display:flex; align-items:center; justify-content:center;
     position:relative;
     overflow:hidden;
@@ -309,22 +402,21 @@
     .hachi .eyebrow{ text-align:left; }
     .hachi p.tagline{ margin-left:0; text-align:left; }
     .duet{ grid-template-columns:1fr; }
-    .note{ padding: 2.4rem 1.6rem; font-size:1.1rem; }
   }
 </style>
 </head>
 <body>
 
-<div class="devwarning" id="devwarning">✎ falta reemplazar el mensaje — edita CONFIG.mensaje en el &lt;script&gt; al final del archivo</div>
-
 <section class="hero">
   <div class="half osaki">
+    <img class="char-art char-osaki" src="assets/nana-osaki.png" alt="">
     <svg class="pin tl" viewBox="0 0 24 24" fill="none" stroke="var(--osaki-bone-dim)" stroke-width="1.2"><path d="M4 14 L14 4 a3 3 0 0 1 4 4 L8 18 a3 3 0 0 1-4-4z"/><circle cx="6" cy="16" r="2.4"/></svg>
     <p class="eyebrow">Nana Osaki</p>
     <h1 class="titan">NANA</h1>
     <p class="tagline">Cuero, humo de cigarro, un escenario y la certeza de que nadie más va a salvarte. La que se sostiene sola.</p>
   </div>
   <div class="half hachi">
+    <img class="char-art char-hachi" src="assets/nana-hachi.png" alt="">
     <p class="eyebrow">Nana Komatsu</p>
     <h1 class="whisper">nana</h1>
     <p class="tagline">Cartas escritas a mano, un tren a Tokio, el corazón siempre puesto en alguien más. La que necesita a otra para no caerse.</p>
@@ -337,12 +429,22 @@
 </section>
 
 <section class="merge">
+  <img class="duo-art" src="assets/nana-duo.png" alt="">
   <p class="room">— como el cuarto 707 —</p>
   <h2>donde las dos mitades dejan de pelear</h2>
-  <div class="note" id="note">
-    <span id="mensaje"></span>
-    <span class="tag" id="firma"></span>
+
+  <div class="vinyl-wrap">
+    <div class="vinyl" id="vinyl">
+      <div class="tonearm" id="tonearm"></div>
+      <div class="vinyl-label" id="vinylLabel">—</div>
+    </div>
+    <div class="tracklist" id="tracklist"></div>
   </div>
+</section>
+
+<section class="letter">
+  <p class="letter-eyebrow">— para ti —</p>
+  <div class="letter-card" id="letterCard"></div>
 </section>
 
 <section class="duet reveal">
@@ -362,22 +464,44 @@
     <span class="word-b">cumpleaños</span>
   </p>
   <p class="date reveal">14 · 08</p>
+  <img class="logo-art reveal" src="assets/nana-logo.png" alt="NANA">
 </section>
 
 <script>
-  // ---------- CONFIG: edita esto cuando tengas el mensaje ----------
-  var CONFIG = {
-    mensaje: "[ escribe aquí tu mensaje — reemplaza este texto ]",
-    firma: "Ignacio → tu hermana · 14.08"
-  };
+  // ---------- CARTA: cada elemento es un párrafo, o {quote,cite} para la cita ----------
+  var CARTA = [
+    `Dear Sister, today is your birthday, i want to start by saying that you should be very very proud of yourself, you are an artist, you have always been, you have the eye of an artist, that doesn't just encapsulates human art, but it resonates deeply with the person you are, most importantly you are sentimental and real, you think beyond what "normal" people do, that does not mean there is a right or wrong way to think, that just means that you see more than average, i feel like i have some part of that too. because you see too much, you can understand more things, and it's not just painful for yourself, im sure you get really sad when you can see other people that you care about doing things that will just cause way more pain for themselves, i believe that this ability among others that are expanded through millions of people, this probably are the most realistic we'll ever be to being superheroes, i believe that "OBSERVERS"(that's the name i give to your super power, sorry thats the best i got haha, feel free to change it) have the end and meaning to help people, try to make them understand what they're doing wrong, and try to guide them, not to the right path, but to their best emotional state that will later help them discover their right path. Althought this is where it gets sad, we can really suffer for not just wasted superfitial goals, but for their own self love, kindness, their meaning... their soul.`,
+    `when this happens that's when the hero task hits, because you role is to understand that there are some people that maybe don't want to understand, thats when we are no longer of use, we can only remember the things that at some point helped that person, even after that you will keep going because the point of the hero is not being praised like a god, the real point is that i'm sure when you help someone, you don't seek recognition, im sure it make You feel truly happy, not because you did it, but because it feels good to help and i will quote a phrase from the movie called "Schinder's List" "Whoever saves one life saves the world entire" so keep that in mind not just for others, but for yourself, you know when something is not good for you, and im sure you will fix it, you'll always know how, because you already thought of it, just as a personal tip, don't wait for the explosion, we people like to avoid conversations that may become bigger problems, but that's the point, if we don't stop it at the right moment, then it will really be a big problem.`,
+    `Most importantly talk to YOU this is for me the most important and what most people won't do, i think we avoid to accept that sometimes a problem is ones fault and don't matter how much it hurts, the end result of that person will only be better.`,
+    `We don't just say words are always the answer for some romantical or poetic reason, but because it is the real answer, as a man i've heard thousands of time of guys that at some point, for some stupid reason, football, basketball, etc, they fought real hard, after that they became real friends and yeah, when they tell the story they say that they fought, they beat the shit of themselves, but im sure the real reason is that after all that, when the animal was fed, they talked, so my tip is, just talk, in every aspect of life even a personal one, just talk, to a person, mom, dad, brother, lover and of course to your cat(i'm sure yours know your most personal goals), so just talk and be yourself, creative, artistic, honest, self sufficient and kind.`,
+    `When there is a problem that affects your emotional or physical avatar, you are the only capable person to know the solution, because it is your problem, no matter how much people will try to say that it may not be that much, but once you have a problem, talk to yourself, you are the only one that have and can answer for that, your take on it, is the only valid one.`,
+    `It have took me 24 years of my life to realize this, because there is no reason to punish yourself, through words or physcal actions, for me at least, there was a point in life, where i didn't understood myself, so when the words of a book didn't stayed in my head and got a bad grade, i just believed what i was told, that i was stupid/dumb, lazy, which at some point i was, but it was my way of protecting myself to all the voices that came to me, when i didn't undertood something. it turns out that i had problems with paying atenttion and couldn't focus, it is not that i didn't understood the words of the book, or the numbers of math, i just need to learn my way, it only took 24 years old and a personal tree where i put every thought or action in order to put an start to my self hatred, that i understood how much words can hurt, and im sure there were really bad people who said things to me, but there were people that were not bad, they just thought that was the best way for my case, i know maybe they didn't meant to hurt, maybe that's the way they were raised and i don't blame them, but i just wish that i could've talked with the person i am today, to explain it to me, maybe if i had, i wouldn't be me today.`,
+    { quote: "One need not intend to harm to do it", cite: "— Baelor Targaryen" },
+    `So as your brother, i encourage you to make your own personal tree, where you put your most secret and personal things, insecurities, anything and then you try to picture yourself as a kid again, you will find so many things, you probably know that those things that hurt you at the time and had an impact on who you are today, but it help you because you get to the point, where if feels as if you were a psicologist reading the life of someone else, feel the need to make them understand it's not their fault, and i hope i will make you bring self forgiveness, or whatever feeling you'll feel. It was not until i did that, that i was able forgive myself, for the self hatred, though. only when i constructed my life was i able to give me some credit. So after all this, i hope to have been of use hahaha and i wish you a very very happy birthday sis.`,
+    `I hope you like the page, i can only take credit for the idea and the words, but ai helped with the looks. Hope you liked it.`,
+    `I have never seen the anime, but i think i understand why you like it.`,
+    `Love you, your brother ;)`
+  ];
   // -------------------------------------------------------------
 
-  var PLACEHOLDER = "[ escribe aquí tu mensaje — reemplaza este texto ]";
-  document.getElementById('mensaje').textContent = CONFIG.mensaje;
-  document.getElementById('firma').textContent = CONFIG.firma;
-  if (CONFIG.mensaje === PLACEHOLDER) {
-    document.getElementById('devwarning').style.display = 'block';
-  }
+  var letterCard = document.getElementById('letterCard');
+  CARTA.forEach(function(block){
+    if (typeof block === 'string'){
+      var p = document.createElement('p');
+      p.textContent = block;
+      letterCard.appendChild(p);
+    } else {
+      var bq = document.createElement('blockquote');
+      var qp = document.createElement('p');
+      qp.textContent = block.quote;
+      var cite = document.createElement('span');
+      cite.className = 'cite';
+      cite.textContent = block.cite;
+      bq.appendChild(qp);
+      bq.appendChild(cite);
+      letterCard.appendChild(bq);
+    }
+  });
 
   var els = document.querySelectorAll('.reveal');
   var io = new IntersectionObserver(function(entries){
@@ -386,6 +510,85 @@
     });
   }, { threshold: 0.15 });
   els.forEach(function(el){ io.observe(el); });
+
+  // ---------- VINILO: edita este arreglo cuando tengas los mp3 definitivos ----------
+  // title / artist son solo texto. file = ruta dentro de assets/ (el mp3 lo pones tú ahí).
+  var TRACKS = [
+    { title: "Rose",            artist: "Anna Tsuchiya — Nana Osaki", file: "assets/rose.mp3" },
+    { title: "A Little Pain",   artist: "Olivia Lufkin — Reira",      file: "assets/a-little-pain.mp3" },
+    { title: "Wish",            artist: "Olivia Lufkin — Reira",      file: "assets/wish.mp3" },
+    { title: "Starless Night",  artist: "Anna Tsuchiya — Nana Osaki", file: "assets/starless-night.mp3" }
+  ];
+  // -----------------------------------------------------------------------------
+
+  var vinylEl = document.getElementById('vinyl');
+  var vinylLabel = document.getElementById('vinylLabel');
+  var tonearm = document.getElementById('tonearm');
+  var tracklistEl = document.getElementById('tracklist');
+  var currentAudio = null;
+  var currentIndex = -1;
+  var fadeInterval = null;
+  var TARGET_VOLUME = 0.85;
+
+  function fadeIn(audio, ms){
+    if (fadeInterval) clearInterval(fadeInterval);
+    audio.volume = 0;
+    var steps = 24, i = 0, stepTime = ms / steps;
+    fadeInterval = setInterval(function(){
+      i++;
+      audio.volume = Math.min(TARGET_VOLUME, (TARGET_VOLUME * i) / steps);
+      if (i >= steps) clearInterval(fadeInterval);
+    }, stepTime);
+  }
+
+  TRACKS.forEach(function(t, i){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'track-btn';
+    btn.innerHTML = '<span class="track-title">' + t.title + '</span><span class="track-artist">' + t.artist + '</span>';
+    btn.addEventListener('click', function(){ toggleTrack(i); });
+    tracklistEl.appendChild(btn);
+  });
+
+  function stopCurrent(){
+    if (fadeInterval){ clearInterval(fadeInterval); fadeInterval = null; }
+    if (currentAudio){ currentAudio.pause(); }
+    vinylEl.classList.remove('playing');
+    tonearm.classList.remove('active');
+    var buttons = tracklistEl.querySelectorAll('.track-btn');
+    buttons.forEach(function(b){ b.classList.remove('active'); });
+  }
+
+  function toggleTrack(i){
+    var buttons = tracklistEl.querySelectorAll('.track-btn');
+    if (currentIndex === i && currentAudio && !currentAudio.paused){
+      stopCurrent();
+      currentIndex = -1;
+      return;
+    }
+    stopCurrent();
+    currentIndex = i;
+    var t = TRACKS[i];
+    currentAudio = new Audio(t.file);
+    currentAudio.loop = true;
+    vinylLabel.textContent = t.title;
+    buttons[i].classList.remove('missing');
+    buttons[i].classList.add('active');
+    currentAudio.addEventListener('error', function(){ markMissing(i, t); });
+    currentAudio.play().then(function(){
+      vinylEl.classList.add('playing');
+      tonearm.classList.add('active');
+      fadeIn(currentAudio, 1800);
+    }).catch(function(){ markMissing(i, t); });
+  }
+
+  function markMissing(i, t){
+    vinylEl.classList.remove('playing');
+    tonearm.classList.remove('active');
+    var buttons = tracklistEl.querySelectorAll('.track-btn');
+    buttons[i].classList.add('missing');
+    vinylLabel.textContent = t.title + ' (falta el mp3)';
+  }
 </script>
 </body>
 </html>
